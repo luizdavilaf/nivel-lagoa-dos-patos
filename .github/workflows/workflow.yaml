@@ -20,7 +20,7 @@ jobs:
         run: |
           wget -q -O /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i /tmp/google-chrome-stable_current_amd64.deb || true
-          sudo apt-get install -y -f
+          sudo apt-get install -y -f
 
       - name: Install ChromeDriver
         run: |
