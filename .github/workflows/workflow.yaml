@@ -17,8 +17,29 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install ChromeDriver
+        run: |
+          wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/LATEST_RELEASE
+          unzip /tmp/chromedriver.zip -d /tmp
+          sudo mv /tmp/chromedriver /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
+
+      - name: Set up ChromeDriver environment
+        run: echo "export PATH=$PATH:/usr/local/bin" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Run script
-        run: python your_script.py  # Change this to your script name
+        run: python your_script.py
+
+      - name: Move graph to output directory
+        run: mv grafico.png output/
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "luizdavilaf@gmail.com"
+          git config --global user.name "Luiz Davila"
+          git add output/grafico.png
+          git commit -m "Update graph"
+          git push

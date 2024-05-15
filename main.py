@@ -12,11 +12,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import requests
 
-
 def fetch_and_process_data(url):
-    url = "https://www.rgpilots.com.br/"
 
-    print("Acessando funcao")
+    print("Acessando função")
     s = Service(r'F:\repos\v4\nivel-lagoa-dos-patos\chromedriver.exe')
     driver = webdriver.Chrome(service=s)
     driver.get(url)
@@ -35,14 +33,11 @@ def fetch_and_process_data(url):
 
         new_df = pd.DataFrame(data)
         try:
-            with open('dados_mare.json', 'r') as f:
-                existing_data = json.load(f)
-            combined_data = existing_data + data
-            with open('dados_mare.json', 'w') as f:
-                json.dump(combined_data, f, indent=4)
+            existing_df = pd.read_csv('dados_mare.csv')
+            combined_df = pd.concat([existing_df, new_df]).drop_duplicates(subset=headers, keep='last')
+            combined_df.to_csv('dados_mare.csv', index=False)
         except FileNotFoundError:
-            with open('dados_mare.json', 'w') as f:
-                json.dump(data, f, indent=4)
+            new_df.to_csv('dados_mare.csv', index=False)
 
     except Exception as e:
         print(f"Erro ao extrair dados: {str(e)}")
@@ -50,9 +45,8 @@ def fetch_and_process_data(url):
         driver.quit()
 
     # Carregar e processar os dados
-    with open('dados_mare.json', 'r') as f:
-        data = json.load(f)
-        df = pd.DataFrame(data)
+    try:
+        df = pd.read_csv('dados_mare.csv')
         df['DD HH:MM'] = pd.to_datetime(df['DD HH:MM'], format='%d/%m/%Y %H:%M')
         df['Medição'] = df['Medição'].replace('-', np.nan).astype(float).add(1.36)
         df = df.dropna(subset=['Medição'])
@@ -73,8 +67,8 @@ def fetch_and_process_data(url):
 
         plt.savefig('grafico.png')  # Salvar o gráfico como imagem
         plt.close()
+    except FileNotFoundError:
+        print("Arquivo CSV não encontrado.")
 
-
-
-
-
+url = "https://www.rgpilots.com.br/"
+fetch_and_process_data(url)
