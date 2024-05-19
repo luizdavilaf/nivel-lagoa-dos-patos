@@ -157,32 +157,52 @@ def main():
 
     # Mostrar o gráfico salvo
     st.image(PLOT_PATH, use_column_width=True, output_format="PNG")
+    
+    # Incluir uma explicação sobre a média móvel
+    st.write("""
+    ### O que é a Média Móvel no gráfico?
+    No contexto deste gráfico, a média móvel é usada
+    para suavizar as flutuações nos níveis de água da Lagoa dos Patos, proporcionando uma visão mais clara
+    das tendências ao longo do tempo.
+    """)
 
     # Incluir um rodapé com informações adicionais
     st.write("""
     ---
     **Informações adicionais:**
+    - Este aplicativo foi desenvolvido durante as enchentes no estado do Rio Grande do Sul com o objetivo de ampliar o acesso à informação na região Sul do estado.
     - Fonte dos dados: [RGPilots](https://www.rgpilots.com.br/)
-    - Este aplicativo foi desenvolvido durante as enchentes no Estado do Rio Grande do Sul com o objetivo
-    de ampliar o acesso à informação na região Sul do Estado.
-    - Desenvolvido por Nilton Sainz (INCT-ReDem/UFPR)
     """)
-
-    # Botão para o perfil do Instagram
+    # Seção de desenvolvedores
+    st.write("""
+    ---
+    ### Desenvolvedores do Projeto:
+    **Nilton Sainz**
+    - INCT ReDem/UFPR
+    """)
     st.markdown(
         """
         <a href="https://www.instagram.com/niltonsainz/" target="_blank">
-            <button>Instagram</button>
+            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Instagram</button>
+        </a>
+        <a href="https://lattes.cnpq.br/7733003139844460" target="_blank">
+            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Lattes</button>
         </a>
         """,
         unsafe_allow_html=True
     )
 
-    # Botão para o perfil Lattes
+    st.write("""
+    **Luiz Sebastião D'ávila Filho**
+    - INCT ReDem/IFRS
+    """)
     st.markdown(
         """
-        <a href="https://lattes.cnpq.br/7733003139844460" target="_blank">
-            <button>Lattes</button>
+        <a href="https://www.instagram.com/luizdavilaf/" target="_blank">
+            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Instagram</button>
+        </a>
+        <a href="http://lattes.cnpq.br/2161738588666342" target="_blank">
+            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Lattes</button>
         </a>
         """,
         unsafe_allow_html=True
