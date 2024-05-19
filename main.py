@@ -191,7 +191,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-
     st.write("""
     **Luiz Sebastião D'ávila Filho**
     - INCT ReDem/IFRS
