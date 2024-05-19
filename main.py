@@ -42,9 +42,11 @@ def process_data(df):
     df['DD HH:MM'] = pd.to_datetime(df['DD HH:MM'], format='%d/%m/%Y %H:%M')
     df['Medição'] = df['Medição'].replace('-', np.nan)
     df['Medição'] = df['Medição'].astype(float)
-    df['Medição'] += 1.36
+    
     df = df.dropna(subset=['Medição'])
     return df
+
+
 
 def plot_tide_data(df):
     # Calcular a média móvel (usando uma janela de 5 períodos como exemplo)
@@ -62,8 +64,13 @@ def plot_tide_data(df):
     p = np.poly1d(z)
     plt.plot(df['DD HH:MM'], p(x), linestyle='--', color='red', label='Linha de Tendência')
 
-    plt.gca().xaxis.set_major_locator(HourLocator(interval=1))
-    plt.gca().xaxis.set_major_formatter(DateFormatter('%d-%m %H:%M'))
+    # Definir intervalo de 4 horas para os ticks do eixo x
+    plt.gca().xaxis.set_major_locator(HourLocator(interval=4))
+    
+    # Formatar as datas no eixo x
+    date_format = DateFormatter('%d-%m %H:%M')
+    plt.gca().xaxis.set_major_formatter(date_format)
+    
     plt.title('Nível da Lagoa dos Patos (Rio Grande-RS)', fontsize=16)
     plt.xlabel('Data e Hora', fontsize=14)
     plt.ylabel('Nível da lagoa (m)', fontsize=14)
@@ -75,16 +82,47 @@ def plot_tide_data(df):
     plt.savefig(PLOT_PATH)  # Salvar o gráfico
     plt.show()
 
+
 def job():
     logging.info(f"Fetching data at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     url = 'https://www.rgpilots.com.br/'
-    df = fetch_tide_data_with_requests(url)
-    if not df.empty:
-        df = process_data(df)
-        df.to_csv(DATA_PATH, index=False)
-        plot_tide_data(df)
+    df_new = fetch_tide_data_with_requests(url)
+    if not df_new.empty:
+        try:
+            # Carregar os dados existentes do arquivo CSV se existirem
+            df_existing = pd.read_csv(DATA_PATH)
+            
+            # Converter as colunas de data para o formato datetime
+            df_existing['DD HH:MM'] = pd.to_datetime(df_existing['DD HH:MM'], format='%d/%m/%Y %H:%M')
+            df_new['DD HH:MM'] = pd.to_datetime(df_new['DD HH:MM'], format='%d/%m/%Y %H:%M')
+
+            # Converter a coluna 'Medição_new' para float e somar 1.36 apenas aos valores que não são igual a '-'
+            df_new['Medição'] = df_new['Medição'].replace('-', np.nan).astype(float) + 1.36
+            
+            # Mesclar os dados recém-obtidos com os dados existentes
+            df_combined = pd.merge(df_existing, df_new, on='DD HH:MM', how='outer', suffixes=('_existing', '_new'))
+
+            # Substituir valores de Medição existentes pelos novos, se a data for igual
+            df_combined['Medição'] = df_combined['Medição_new'].combine_first(df_combined['Medição_existing'])
+            df_combined.drop(columns=['Medição_new', 'Previsão_new'], inplace=True)
+        except FileNotFoundError:
+            # Se o arquivo CSV não existir, use apenas os dados recém-obtidos
+            df_combined = df_new
+        
+        # Salvar o DataFrame combinado de volta no arquivo CSV mantendo o formato de data original
+        df_combined.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
+        
+        # Processar os dados combinados
+        df_combined_processed = process_data(df_combined)
+        
+        # Plotar os dados combinados
+        plot_tide_data(df_combined_processed)
     else:
         logging.warning("No data fetched.")
+
+
+
+
 
 # Agendar a execução da raspagem de dados a cada 10 minutos
 schedule.every(10).minutes.do(job)
