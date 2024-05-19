@@ -6,7 +6,7 @@ click==8.0.3
 colorama==0.4.4
 cryptography==36.0.0
 idna==3.3
-numpy>=1.21.3<1.22
+numpy>=1.20.3,<1.22
 Pillow==8.4.0
 protobuf==3.20.0
 requests==2.26.0
