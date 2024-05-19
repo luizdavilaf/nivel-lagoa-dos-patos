@@ -104,7 +104,8 @@ def job():
 
             # Substituir valores de Medição existentes pelos novos, se a data for igual
             df_combined['Medição'] = df_combined['Medição_new'].combine_first(df_combined['Medição_existing'])
-            df_combined.drop(columns=['Medição_new', 'Previsão_new'], inplace=True)
+            df_combined['Previsão'] = df_combined['Previsão_new'].combine_first(df_combined['Previsão_existing'])
+            df_combined.drop(columns=['Medição_new', 'Previsão_new', 'Medição_existing', 'Previsão_existing'], inplace=True)
         except FileNotFoundError:
             # Se o arquivo CSV não existir, use apenas os dados recém-obtidos
             df_combined = df_new
