@@ -3,6 +3,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 from matplotlib.dates import DateFormatter, HourLocator
 import requests
 from bs4 import BeautifulSoup
@@ -10,9 +11,13 @@ import logging
 import schedule
 import streamlit as st
 from threading import Thread
+import os
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Configurar o backend do matplotlib
+matplotlib.use('Agg')
 
 # Caminho para salvar os dados e o gráfico
 DATA_PATH = "tide_data.csv"
@@ -47,9 +52,6 @@ def process_data(df):
     df = df.sort_values(by='DD HH:MM')
     return df
 
-
-
-
 def plot_tide_data(df):
     # Calcular a média móvel (usando uma janela de 5 períodos como exemplo)
     df.loc[:, 'Média Móvel'] = df['Medição'].rolling(window=5).mean()
@@ -81,9 +83,18 @@ def plot_tide_data(df):
     plt.yticks(fontsize=12)
     plt.legend(fontsize=12)
     plt.tight_layout()
-    plt.savefig(PLOT_PATH)  # Salvar o gráfico
-    # plt.show()
 
+    # Certifique-se de que o diretório existe
+    os.makedirs(os.path.dirname(PLOT_PATH), exist_ok=True)
+    
+    # Salvar o gráfico
+    try:
+        plt.savefig(PLOT_PATH)
+        logging.info(f"Plot saved to {PLOT_PATH}")
+    except Exception as e:
+        logging.error(f"Error saving plot: {e}")
+    finally:
+        plt.close()
 
 def job():
     logging.info(f"Fetching data at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -114,22 +125,16 @@ def job():
 
         df_combined = df_combined.sort_values(by='DD HH:MM')
 
-                # Processar os dados combinados
+        # Processar os dados combinados
         df_combined_processed = process_data(df_combined)
         
         # Salvar o DataFrame combinado de volta no arquivo CSV mantendo o formato de data original
         df_combined_processed.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
         
-
-        
         # Plotar os dados combinados
         plot_tide_data(df_combined_processed)
     else:
         logging.warning("No data fetched.")
-
-
-
-
 
 # Agendar a execução da raspagem de dados a cada 10 minutos
 schedule.every(10).minutes.do(job)

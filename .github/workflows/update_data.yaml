@@ -3,7 +3,7 @@ name: Update CSV
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/30 * * * *' # Executar a cada 30 minutos
+    - cron: '*/15 * * * *' # Executar a cada 30 minutos
 
 jobs:
   update-csv:
