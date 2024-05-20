@@ -85,7 +85,8 @@ def plot_tide_data(df):
     plt.tight_layout()
 
     # Certifique-se de que o diretório existe
-    os.makedirs(os.path.dirname(PLOT_PATH), exist_ok=True)
+    if os.path.dirname(PLOT_PATH):
+        os.makedirs(os.path.dirname(PLOT_PATH), exist_ok=True)
     
     # Salvar o gráfico
     try:
@@ -136,18 +137,18 @@ def job():
     else:
         logging.warning("No data fetched.")
 
-# Agendar a execução da raspagem de dados a cada 10 minutos
-schedule.every(10).minutes.do(job)
+# # Agendar a execução da raspagem de dados a cada 10 minutos
+# schedule.every(10).minutes.do(job)
 
-def run_schedule():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+# def run_schedule():
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
 
-# Iniciar o agendamento em background
-t = Thread(target=run_schedule)
-t.daemon = True
-t.start()
+# # Iniciar o agendamento em background
+# t = Thread(target=run_schedule)
+# t.daemon = True
+# t.start()
 
 def main():
     # Executar a raspagem imediatamente na inicialização
