@@ -190,19 +190,19 @@ def main():
     <style>
     .button {
         display: inline-block;
-        background-color: #4CAF50;  /* Cor do fundo do botão */
+        background-color: #EEEEEE;  /* Cor do fundo do botão */
         color: black !important;  /* Cor do texto */
-        padding: 10px 20px;
+        padding: 8px 16px;
         text-align: center;
         text-decoration: none;
         border: none;
-        border-radius: 12px;
+        border-radius: 8px;
         margin: 5px;
         transition: background-color 0.3s, color 0.3s;
-        font-size: 16px;  /* Tamanho da fonte */
+        font-size: 12px;  /* Tamanho da fonte */
     }
     .button:hover {
-        background-color: #45a049;  /* Cor do fundo do botão ao passar o mouse */
+        background-color: #EEEEEE;  /* Cor do fundo do botão ao passar o mouse */
         color: white !important;  /* Cor do texto ao passar o mouse */
     }
     </style>
