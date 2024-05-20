@@ -185,6 +185,32 @@ def main():
     - Este aplicativo foi desenvolvido durante as enchentes no estado do Rio Grande do Sul com o objetivo de ampliar o acesso à informação na região Sul do estado.
     - Fonte dos dados: [RGPilots](https://www.rgpilots.com.br/)
     """)
+    # Estilo personalizado para os botões
+    button_style = """
+    <style>
+    .button {
+        display: inline-block;
+        background-color: #4CAF50;  /* Cor do fundo do botão */
+        color: black !important;  /* Cor do texto */
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        border-radius: 12px;
+        margin: 5px;
+        transition: background-color 0.3s, color 0.3s;
+        font-size: 16px;  /* Tamanho da fonte */
+    }
+    .button:hover {
+        background-color: #45a049;  /* Cor do fundo do botão ao passar o mouse */
+        color: white !important;  /* Cor do texto ao passar o mouse */
+    }
+    </style>
+    """
+    
+    # Adiciona o estilo personalizado ao Streamlit
+    st.markdown(button_style, unsafe_allow_html=True)
+
     # Seção de desenvolvedores
     st.write("""
     ---
@@ -194,12 +220,10 @@ def main():
     """)
     st.markdown(
         """
-        <a href="https://www.instagram.com/niltonsainz/" target="_blank">
-            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Instagram</button>
-        </a>
-        <a href="https://lattes.cnpq.br/7733003139844460" target="_blank">
-            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Lattes</button>
-        </a>
+        <div>
+            <a href="https://www.instagram.com/niltonsainz/" target="_blank" class="button">Instagram</a>
+            <a href="https://lattes.cnpq.br/7733003139844460" target="_blank" class="button">Lattes</a>
+        </div>
         """,
         unsafe_allow_html=True
     )
@@ -209,12 +233,10 @@ def main():
     """)
     st.markdown(
         """
-        <a href="https://www.instagram.com/luizdavilaf/" target="_blank">
-            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Instagram</button>
-        </a>
-        <a href="http://lattes.cnpq.br/2161738588666342" target="_blank">
-            <button style="padding: 6px 16px; font-size: 12px; margin: 5px;">Lattes</button>
-        </a>
+        <div>
+            <a href="https://www.instagram.com/luizdavilaf/" target="_blank" class="button">Instagram</a>
+            <a href="http://lattes.cnpq.br/2161738588666342" target="_blank" class="button">Lattes</a>
+        </div>
         """,
         unsafe_allow_html=True
     )
