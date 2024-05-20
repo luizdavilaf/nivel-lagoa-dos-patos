@@ -51,7 +51,7 @@ def process_data(df):
 
 def plot_tide_data(df):
     # Calcular a média móvel (usando uma janela de 5 períodos como exemplo)
-    df['Média Móvel'] = df['Medição'].rolling(window=5).mean()
+    df.loc[:, 'Média Móvel'] = df['Medição'].rolling(window=5).mean()
 
     plt.clf()
     plt.figure(figsize=(18, 9))  # Ajustar o tamanho do gráfico
@@ -81,7 +81,7 @@ def plot_tide_data(df):
     plt.legend(fontsize=12)
     plt.tight_layout()
     plt.savefig(PLOT_PATH)  # Salvar o gráfico
-    plt.show()
+    # plt.show()
 
 
 def job():
@@ -110,12 +110,16 @@ def job():
         except FileNotFoundError:
             # Se o arquivo CSV não existir, use apenas os dados recém-obtidos
             df_combined = df_new
+
+        df_combined = df_combined.sort_values(by='DD HH:MM')
+
+                # Processar os dados combinados
+        df_combined_processed = process_data(df_combined)
         
         # Salvar o DataFrame combinado de volta no arquivo CSV mantendo o formato de data original
-        df_combined.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
+        df_combined_processed.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
         
-        # Processar os dados combinados
-        df_combined_processed = process_data(df_combined)
+
         
         # Plotar os dados combinados
         plot_tide_data(df_combined_processed)
