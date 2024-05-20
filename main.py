@@ -44,6 +44,7 @@ def process_data(df):
     df['Medição'] = df['Medição'].astype(float).round(2)  # Arredondar para 2 casas decimais
     
     df = df.dropna(subset=['Medição'])
+    df = df.sort_values(by='DD HH:MM')
     return df
 
 
