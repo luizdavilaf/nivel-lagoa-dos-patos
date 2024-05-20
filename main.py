@@ -41,10 +41,11 @@ def fetch_tide_data_with_requests(url):
 def process_data(df):
     df['DD HH:MM'] = pd.to_datetime(df['DD HH:MM'], format='%d/%m/%Y %H:%M')
     df['Medição'] = df['Medição'].replace('-', np.nan)
-    df['Medição'] = df['Medição'].astype(float)
+    df['Medição'] = df['Medição'].astype(float).round(2)  # Arredondar para 2 casas decimais
     
     df = df.dropna(subset=['Medição'])
     return df
+
 
 
 
