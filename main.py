@@ -13,6 +13,7 @@ import streamlit as st
 from threading import Thread
 import os
 
+
 # Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -96,7 +97,7 @@ def plot_tide_data(df):
         logging.error(f"Error saving plot: {e}")
     finally:
         plt.close()
-
+        
 def job():
     logging.info(f"Fetching data at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     url = 'https://www.rgpilots.com.br/'
@@ -104,27 +105,19 @@ def job():
     if not df_new.empty:
         try:
             # Carregar os dados existentes do arquivo CSV se existirem
-            df_existing = pd.read_csv(DATA_PATH)
-            
-            # Converter as colunas de data para o formato datetime
-            df_existing['DD HH:MM'] = pd.to_datetime(df_existing['DD HH:MM'], format='%d/%m/%Y %H:%M')
-            df_new['DD HH:MM'] = pd.to_datetime(df_new['DD HH:MM'], format='%d/%m/%Y %H:%M')
+            df_existing = pd.read_csv(DATA_PATH, parse_dates=['DD HH:MM'], dayfirst=True)
 
+            
             # Converter a coluna 'Medição_new' para float e somar 1.36 apenas aos valores que não são igual a '-'
+            df_new['DD HH:MM'] = pd.to_datetime(df_new['DD HH:MM'], format='%d/%m/%Y %H:%M')
             df_new['Medição'] = df_new['Medição'].replace('-', np.nan).astype(float) + 1.36
             
             # Mesclar os dados recém-obtidos com os dados existentes
-            df_combined = pd.merge(df_existing, df_new, on='DD HH:MM', how='outer', suffixes=('_existing', '_new'))
+            df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['DD HH:MM']).sort_values(by='DD HH:MM')
 
-            # Substituir valores de Medição existentes pelos novos, se a data for igual
-            df_combined['Medição'] = df_combined['Medição_new'].combine_first(df_combined['Medição_existing'])
-            df_combined['Previsão'] = df_combined['Previsão_new'].combine_first(df_combined['Previsão_existing'])
-            df_combined.drop(columns=['Medição_new', 'Previsão_new', 'Medição_existing', 'Previsão_existing'], inplace=True)
         except FileNotFoundError:
             # Se o arquivo CSV não existir, use apenas os dados recém-obtidos
             df_combined = df_new
-
-        df_combined = df_combined.sort_values(by='DD HH:MM')
 
         # Processar os dados combinados
         df_combined_processed = process_data(df_combined)
@@ -136,7 +129,6 @@ def job():
         plot_tide_data(df_combined_processed)
     else:
         logging.warning("No data fetched.")
-
 # # Agendar a execução da raspagem de dados a cada 10 minutos
 # schedule.every(10).minutes.do(job)
 
