@@ -13,6 +13,7 @@ import streamlit as st
 from threading import Thread
 import os
 
+
 # Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -104,9 +105,11 @@ def job():
     if not df_new.empty:
         try:
             # Carregar os dados existentes do arquivo CSV se existirem
-            df_existing = pd.read_csv(DATA_PATH, parse_dates=['DD HH:MM'])
+            df_existing = pd.read_csv(DATA_PATH, parse_dates=['DD HH:MM'], dayfirst=True)
+
             
             # Converter a coluna 'Medição_new' para float e somar 1.36 apenas aos valores que não são igual a '-'
+            df_new['DD HH:MM'] = pd.to_datetime(df_new['DD HH:MM'], format='%d/%m/%Y %H:%M')
             df_new['Medição'] = df_new['Medição'].replace('-', np.nan).astype(float) + 1.36
             
             # Mesclar os dados recém-obtidos com os dados existentes
