@@ -35,9 +35,10 @@ def fetch_tide_data_with_requests(url):
 def process_data(df):
     df['DD HH:MM'] = pd.to_datetime(df['DD HH:MM'], format='%d/%m/%Y %H:%M')
     df['Medição'] = df['Medição'].replace('-', np.nan)
-    df['Medição'] = df['Medição'].astype(float)
+    df['Medição'] = df['Medição'].astype(float).round(2)  # Arredondar para 2 casas decimais
     
     df = df.dropna(subset=['Medição'])
+    df = df.sort_values(by='DD HH:MM')
     return df
 
 def job():
@@ -47,31 +48,28 @@ def job():
     if not df_new.empty:
         try:
             # Carregar os dados existentes do arquivo CSV se existirem
-            df_existing = pd.read_csv(DATA_PATH)
-            
-            # Converter as colunas de data para o formato datetime
-            df_existing['DD HH:MM'] = pd.to_datetime(df_existing['DD HH:MM'], format='%d/%m/%Y %H:%M')
-            df_new['DD HH:MM'] = pd.to_datetime(df_new['DD HH:MM'], format='%d/%m/%Y %H:%M')
+            df_existing = pd.read_csv(DATA_PATH, parse_dates=['DD HH:MM'], dayfirst=True)
 
+            
             # Converter a coluna 'Medição_new' para float e somar 1.36 apenas aos valores que não são igual a '-'
+            df_new['DD HH:MM'] = pd.to_datetime(df_new['DD HH:MM'], format='%d/%m/%Y %H:%M')
             df_new['Medição'] = df_new['Medição'].replace('-', np.nan).astype(float) + 1.36
             
             # Mesclar os dados recém-obtidos com os dados existentes
-            df_combined = pd.merge(df_existing, df_new, on='DD HH:MM', how='outer', suffixes=('_existing', '_new'))
+            df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['DD HH:MM']).sort_values(by='DD HH:MM')
 
-            # Substituir valores de Medição existentes pelos novos, se a data for igual
-            df_combined['Medição'] = df_combined['Medição_new'].combine_first(df_combined['Medição_existing'])
-            df_combined['Previsão'] = df_combined['Previsão_new'].combine_first(df_combined['Previsão_existing'])
-            df_combined.drop(columns=['Medição_new', 'Previsão_new', 'Medição_existing', 'Previsão_existing'], inplace=True)
         except FileNotFoundError:
             # Se o arquivo CSV não existir, use apenas os dados recém-obtidos
             df_combined = df_new
-        
-        # Salvar o DataFrame combinado de volta no arquivo CSV mantendo o formato de data original
-        df_combined.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
-        
+
         # Processar os dados combinados
         df_combined_processed = process_data(df_combined)
+        
+        # Salvar o DataFrame combinado de volta no arquivo CSV mantendo o formato de data original
+        df_combined_processed.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
+        
+        # Plotar os dados combinados
+        plot_tide_data(df_combined_processed)
     else:
         logging.warning("No data fetched.")
 
