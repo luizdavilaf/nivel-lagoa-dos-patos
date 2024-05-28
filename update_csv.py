@@ -68,8 +68,7 @@ def job():
         # Salvar o DataFrame combinado de volta no arquivo CSV mantendo o formato de data original
         df_combined_processed.to_csv(DATA_PATH, index=False, date_format='%d/%m/%Y %H:%M')
         
-        # Plotar os dados combinados
-        plot_tide_data(df_combined_processed)
+        
     else:
         logging.warning("No data fetched.")
 
